@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hội Thi Trường Học Xanh - Phú Nhuận 2025 (Tournament Edition)</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --success: #198754;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #0dcaf0;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #eef2f5;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- MÀN HÌNH CHỜ & ĐĂNG KÝ --- */
+        .full-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            transition: opacity 0.3s;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            border: none;
+            width: 300px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-large {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--warning);
+            color: var(--dark);
+            transition: transform 0.2s;
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+        }
+        .btn-large:hover { transform: scale(1.05); }
+
+        /* --- BẢNG XẾP HẠNG --- */
+        .leaderboard-box {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; font-size: 1.2rem; }
+        th { background: var(--primary); color: white; }
+        tr:nth-child(1) td { font-weight: bold; color: #d63384; font-size: 1.3rem; } /* Top 1 */
+        
+        /* --- GAME UI --- */
+        header {
+            background: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            height: 70px;
+        }
+
+        .team-name { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
+        
+        .hud {
+            display: flex;
+            gap: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .timer-box { color: var(--danger); background: #fff5f5; padding: 5px 15px; border-radius: 8px; border: 1px solid var(--danger); }
+        .score-box { color: var(--success); background: #f0fff4; padding: 5px 15px; border-radius: 8px; border: 1px solid var(--success); }
+
+        #btn-submit {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #btn-submit:disabled { background: #ccc; cursor: default; }
+
+        /* --- GAME AREA --- */
+        #game-container {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #play-area {
+            flex: 1;
+            position: relative;
+            background-color: #f4f6f9;
+            background-image: radial-gradient(#dee2e6 2px, transparent 2px);
+            background-size: 30px 30px;
+            border-bottom: 3px solid #ccc;
+        }
+
+        /* --- TRASH ITEMS --- */
+        .trash-card {
+            width: 110px;
+            height: 110px; /* Hình vuông */
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: transform 0.2s;
+            z-index: 50;
+            border: 2px solid white;
+            padding: 5px;
+        }
+
+        .trash-card:active { cursor: grabbing; transform: scale(1.1); z-index: 100; border-color: var(--warning); }
+        
+        .trash-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; }
+        .trash-label { font-size: 0.9rem; font-weight: bold; text-align: center; line-height: 1.1; color: #495057; }
+
+        /* --- BINS --- */
+        #bins-area {
+            height: 250px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: flex-end;
+            padding: 10px;
+            background: #e9ecef;
+        }
+
+        .bin-zone {
+            width: 30%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .bin-storage {
+            flex: 1;
+            background: rgba(255,255,255,0.6);
+            border: 3px dashed #adb5bd;
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+
+        .bin-storage.drag-over { background: rgba(255, 235, 59, 0.3); border-color: var(--warning); transform: scale(1.02); }
+
+        .bin-header {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Style cho item khi nằm trong thùng */
+        .trash-card.in-bin {
+            position: static !important;
+            width: 60px !important;
+            height: 60px !important;
+            margin: 3px;
+            border: 1px solid #ddd;
+            box-shadow: none;
+        }
+        .trash-card.in-bin .trash-img { width: 35px; height: 35px; margin-bottom: 0; }
+        .trash-card.in-bin .trash-label { font-size: 0.6rem; display: none; } /* Ẩn chữ khi vào thùng cho gọn */
+
+        /* Màu thùng */
+        .bg-organic { background-color: var(--success); }
+        .bg-recycle { background-color: var(--info); }
+        .bg-other { background-color: var(--dark); }
+
+        .hidden { display: none !important; }
+
+        /* Tiện ích */
+        .btn-link { background: none; border: none; color: #0d6efd; text-decoration: underline; cursor: pointer; margin-top: 10px;}
+    </style>
+</head>
+<body>
+
+    <div id="screen-register" class="full-screen">
+        <h1 style="color: var(--warning); text-transform: uppercase; font-size: 3rem;">Hội Thi Trường Học Xanh</h1>
+        <h2>Phần thi: Thực hành Phân loại rác</h2>
+        
+        <div class="input-group">
+            <p>Nhập tên Đơn vị / Trường học:</p>
+            <input type="text" id="inp-team-name" placeholder="Ví dụ: Tiểu học A..." autocomplete="off">
+            <br>
+            <button class="btn-large" onclick="goToGame()">BẮT ĐẦU THI</button>
+        </div>
+        
+        <button class="btn-link" style="color:white" onclick="showLeaderboard()">Xem Bảng Xếp Hạng</button>
+    </div>
+
+    <div id="screen-leaderboard" class="full-screen hidden">
+        <h2 style="color: var(--warning);">BẢNG TỔNG SẮP</h2>
+        <div class="leaderboard-box">
+            <table id="tbl-leaderboard">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Đơn vị</th>
+                        <th>Điểm</th>
+                        <th>Thời gian còn lại</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="btn-large" onclick="backToRegister()">Quay lại</button>
+            <button class="btn-link" style="color: #adb5bd; margin-left: 20px;" onclick="clearData()">Xóa dữ liệu</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="hidden" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+        <header>
+            <div class="team-name" id="display-team-name">ĐỘI THI: ???</div>
+            <button id="btn-submit" onclick="submitGame()">NỘP BÀI (KẾT THÚC)</button>
+            <div class="hud">
+                <div class="timer-box">⏳ <span id="timer">04:00</span></div>
+                <div class="score-box" style="display:none">Điểm: <span id="score">0</span></div> </div>
+        </header>
+
+        <div id="game-container">
+            <div id="play-area"></div>
+
+            <div id="bins-area">
+                <div class="bin-zone">
+                    <div class="bin-storage" id="bin-organic" data-type="organic"></div>
+                    <div class="bin-header bg-organic">🍏 RÁC THỰC PHẨM</div>
+                </div>
+                <div class="bin-zone">
+                    <div class="bin-storage" id="bin-recycle" data-type="recycle"></div>
+                    <div class="bin-header bg-recycle">♻️ RÁC TÁI CHẾ</div>
+                </div>
+                <div class="bin-zone">
+                    <div class="bin-storage" id="bin-other" data-type="other"></div>
+                    <div class="bin-header bg-other">🗑️ RÁC CÒN LẠI</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-result" class="full-screen hidden" style="background: rgba(0,0,0,0.8);">
+        <h1 style="color: white">KẾT QUẢ</h1>
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; color: black;">
+            <h2 id="res-team" style="color: var(--primary)">Đội: ABC</h2>
+            <h1 id="res-score" style="font-size: 5rem; margin: 10px 0; color: var(--danger)">45/50</h1>
+            <p id="res-msg" style="font-size: 1.5rem;">Cố gắng lên nhé!</p>
+            <button class="btn-large" onclick="saveAndExit()">LƯU KẾT QUẢ</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CÔNG NGHỆ TẠO HÌNH ẢNH TỰ ĐỘNG (SVG) ---
+        // Hàm này tạo ra một chuỗi Data URI của ảnh SVG dựa trên Icon và Màu sắc
+        // Giúp không cần file ảnh bên ngoài mà vẫn có icon đẹp.
+        function createSVGIcon(emoji, bgColor) {
+            const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="${bgColor}" stroke="#333" stroke-width="2"/>
+                <text x="50" y="60" font-size="50" text-anchor="middle" font-family="Arial">${emoji}</text>
+            </svg>`;
+            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        }
+
+        // --- 2. NGÂN HÀNG ĐỀ THI (40 MÓN + BẪY) ---
+        // organic (Thực phẩm), recycle (Tái chế), other (Còn lại)
+        const trashDatabase = [
+            // --- NHÓM THỰC PHẨM (Xanh lá nhạt) ---
+            { name: "Vỏ chuối", type: "organic", icon: "🍌", color: "#d4edda" },
+            { name: "Xương cá", type: "organic", icon: "🐟", color: "#d4edda" },
+            { name: "Rau héo", type: "organic", icon: "🥬", color: "#d4edda" },
+            { name: "Vỏ trứng", type: "organic", icon: "🥚", color: "#d4edda" },
+            { name: "Bã trà", type: "organic", icon: "🫖", color: "#d4edda" },
+            { name: "Cơm thừa", type: "organic", icon: "🍚", color: "#d4edda" },
+            { name: "Vỏ cam", type: "organic", icon: "🍊", color: "#d4edda" },
+            { name: "Bánh mì cũ", type: "organic", icon: "🥖", color: "#d4edda" },
+            { name: "Hạt xoài", type: "organic", icon: "🥭", color: "#d4edda" },
+            { name: "Hoa tàn", type: "organic", icon: "🥀", color: "#d4edda" },
+
+            // --- NHÓM TÁI CHẾ (Xanh dương nhạt) ---
+            { name: "Chai nhựa", type: "recycle", icon: "🍾", color: "#cff4fc" },
+            { name: "Lon nước", type: "recycle", icon: "🥤", color: "#cff4fc" },
+            { name: "Giấy báo", type: "recycle", icon: "📰", color: "#cff4fc" },
+            { name: "Hộp các-tông", type: "recycle", icon: "📦", color: "#cff4fc" },
+            { name: "Sách cũ", type: "recycle", icon: "📚", color: "#cff4fc" },
+            { name: "Lon đồ hộp", type: "recycle", icon: "🥫", color: "#cff4fc" },
+            { name: "Chai thủy tinh", type: "recycle", icon: "🏺", color: "#cff4fc" },
+            { name: "Thìa inox", type: "recycle", icon: "🥄", color: "#cff4fc" },
+            { name: "Vở học sinh", type: "recycle", icon: "📒", color: "#cff4fc" },
+            { name: "Ghế nhựa hỏng", type: "recycle", icon: "🪑", color: "#cff4fc" },
+
+            // --- NHÓM CÒN LẠI (Xám nhạt) ---
+            { name: "Túi nilon", type: "other", icon: "🛍️", color: "#e2e3e5" },
+            { name: "Khẩu trang", type: "other", icon: "😷", color: "#e2e3e5" },
+            { name: "Ly sành vỡ", type: "other", icon: "🍵", color: "#e2e3e5" },
+            { name: "Tã giấy", type: "other", icon: "🧷", color: "#e2e3e5" },
+            { name: "Giấy ăn bẩn", type: "other", icon: "🤧", color: "#e2e3e5" },
+            { name: "Gói kẹo", type: "other", icon: "🍬", color: "#e2e3e5" },
+            { name: "Gói snack", type: "other", icon: "🍟", color: "#e2e3e5" },
+            { name: "Bút bi hết mực", type: "other", icon: "🖊️", color: "#e2e3e5" },
+            { name: "Gương vỡ", type: "other", icon: "🪞", color: "#e2e3e5" },
+            { name: "Bật lửa", type: "other", icon: "🔥", color: "#e2e3e5" },
+
+            // --- CÁC CÂU HỎI BẪY / KHÓ (Để phân loại đội giỏi) ---
+            // Ly giấy thường có lớp nhựa -> Khó tái chế -> Rác còn lại
+            { name: "Ly giấy cafe", type: "other", icon: "☕", color: "#fff3cd" }, 
+            // Hộp xốp dính dầu mỡ -> Không tái chế được -> Rác còn lại
+            { name: "Hộp xốp bẩn", type: "other", icon: "🥡", color: "#fff3cd" }, 
+            // Pin là rác nguy hại -> Trong quy mô 3 thùng thì bỏ vào Còn lại (hoặc thùng riêng nếu có, ở đây quy ước Còn Lại)
+            { name: "Pin cũ", type: "other", icon: "🔋", color: "#fff3cd" },
+            // Ống hút nhựa -> Quá nhỏ/giá trị thấp -> Thường là Rác còn lại
+            { name: "Ống hút", type: "other", icon: "🧃", color: "#fff3cd" },
+        ];
+
+        // --- 3. QUẢN LÝ GAME ---
+        let currentTeam = "";
+        let gameTimer;
+        let timeLeft = 240; // 4 phút
+        let finalScore = 0;
+        let isPlaying = false;
+
+        // Khởi tạo App
+        function init() {
+            // Kiểm tra xem có dữ liệu cũ không
+            if(!localStorage.getItem('greenSchoolData')) {
+                localStorage.setItem('greenSchoolData', JSON.stringify([]));
+            }
+        }
+        init();
+
+        function goToGame() {
+            const nameInput = document.getElementById('inp-team-name');
+            if (nameInput.value.trim() === "") {
+                alert("Vui lòng nhập tên Đội thi!");
+                return;
+            }
+            currentTeam = nameInput.value.trim();
+            document.getElementById('display-team-name').innerText = "ĐỘI THI: " + currentTeam;
+            
+            // Chuyển màn hình
+            document.getElementById('screen-register').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            
+            startGame();
+        }
+
+        function startGame() {
+            timeLeft = 240; // Reset thời gian
+            isPlaying = true;
+            document.getElementById('btn-submit').disabled = false;
+            document.getElementById('btn-submit').innerText = "NỘP BÀI (KẾT THÚC)";
+            updateTimerDisplay();
+
+            // Xóa rác cũ
+            document.getElementById('play-area').innerHTML = '';
+            document.querySelectorAll('.bin-storage').forEach(b => b.innerHTML = '');
+
+            // Lấy ngẫu nhiên 15 món từ 40 món (để mỗi lần thi mỗi khác)
+            spawnTrash(15);
+
+            // Chạy đồng hồ
+            clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    submitGame();
+                }
+            }, 1000);
+        }
+
+        function spawnTrash(count) {
+            const area = document.getElementById('play-area');
+            // Trộn mảng rác
+            const shuffled = [...trashDatabase].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, count);
+
+            selected.forEach((item, i) => {
+                const el = document.createElement('div');
+                el.classList.add('trash-card');
+                el.id = 'trash-' + i;
+                el.dataset.type = item.type; // Đáp án đúng
+
+                // Tạo hình ảnh bằng code
+                const img = document.createElement('img');
+                img.src = createSVGIcon(item.icon, item.color);
+                img.classList.add('trash-img');
+                
+                const lbl = document.createElement('div');
+                lbl.classList.add('trash-label');
+                lbl.innerText = item.name;
+
+                el.appendChild(img);
+                el.appendChild(lbl);
+
+                // Vị trí ngẫu nhiên
+                const maxX = area.clientWidth - 120;
+                const maxY = area.clientHeight - 120;
+                el.style.left = Math.random() * maxX + 'px';
+                el.style.top = Math.random() * maxY + 'px';
+
+                setupDrag(el);
+                area.appendChild(el);
+            });
+        }
+
+        // --- XỬ LÝ KÉO THẢ (DRAG & DROP) ---
+        let activeItem = null;
+        let startX, startY, startLeft, startTop;
+
+        function setupDrag(el) {
+            el.addEventListener('mousedown', dragStart);
+            el.addEventListener('touchstart', dragStart, {passive: false});
+        }
+
+        function dragStart(e) {
+            if (!isPlaying) return;
+            if (e.type === 'touchstart') e.preventDefault();
+            
+            activeItem = this;
+            
+            // Logic xử lý khi kéo từ thùng ra ngoài
+            if (activeItem.classList.contains('in-bin')) {
+                activeItem.classList.remove('in-bin');
+                activeItem.style.position = 'absolute';
+                document.getElementById('play-area').appendChild(activeItem); // Đưa về vùng chơi
+                // Vị trí tạm tại con trỏ
+            }
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            startX = clientX;
+            startY = clientY;
+            
+            // Lấy vị trí hiện tại (hoặc set vị trí chuột nếu vừa lôi từ thùng ra)
+            const rect = activeItem.getBoundingClientRect();
+            // Chuyển đổi toạ độ global sang local của play-area
+            const areaRect = document.getElementById('play-area').getBoundingClientRect();
+            
+            startLeft = rect.left - areaRect.left;
+            startTop = rect.top - areaRect.top;
+
+            activeItem.style.left = startLeft + 'px';
+            activeItem.style.top = startTop + 'px';
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchmove', dragMove, {passive: false});
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!activeItem) return;
+            if (e.type === 'touchmove') e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            activeItem.style.left = (startLeft + dx) + 'px';
+            activeItem.style.top = (startTop + dy) + 'px';
+
+            // Hiệu ứng hover thùng
+            document.querySelectorAll('.bin-storage').forEach(bin => {
+                const rect = bin.getBoundingClientRect();
+                if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                    bin.classList.add('drag-over');
+                } else {
+                    bin.classList.remove('drag-over');
+                }
+            });
+        }
+
+        function dragEnd(e) {
+            if (!activeItem) return;
+            
+            // Xóa sự kiện
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('touchend', dragEnd);
+
+            // Kiểm tra thả vào thùng
+            const rect = activeItem.getBoundingClientRect();
+            const center_x = rect.left + rect.width/2;
+            const center_y = rect.top + rect.height/2;
+
+            let droppedBin = null;
+            document.querySelectorAll('.bin-storage').forEach(bin => {
+                bin.classList.remove('drag-over');
+                const bRect = bin.getBoundingClientRect();
+                if (center_x >= bRect.left && center_x <= bRect.right && center_y >= bRect.top && center_y <= bRect.bottom) {
+                    droppedBin = bin;
+                }
+            });
+
+            if (droppedBin) {
+                // Vào thùng
+                droppedBin.appendChild(activeItem);
+                activeItem.classList.add('in-bin');
+                activeItem.style.left = 'auto';
+                activeItem.style.top = 'auto';
+                activeItem.dataset.choice = droppedBin.dataset.type; // Lưu lựa chọn
+            } else {
+                // Ra ngoài (giới hạn trong play-area)
+                const area = document.getElementById('play-area');
+                const areaRect = area.getBoundingClientRect();
+                let finalL = parseInt(activeItem.style.left);
+                let finalT = parseInt(activeItem.style.top);
+                
+                // Giữ trong khung
+                if(finalL < 0) finalL = 0;
+                if(finalT < 0) finalT = 0;
+                if(finalL > area.clientWidth - 100) finalL = area.clientWidth - 100;
+                if(finalT > area.clientHeight - 100) finalT = area.clientHeight - 100;
+
+                activeItem.style.left = finalL + 'px';
+                activeItem.style.top = finalT + 'px';
+                activeItem.dataset.choice = ""; // Không chọn
+            }
+
+            activeItem = null;
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timer').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }
+
+        // --- 4. TÍNH ĐIỂM & KẾT THÚC ---
+        function submitGame() {
+            if (!isPlaying) return;
+            isPlaying = false;
+            clearInterval(gameTimer);
+            document.getElementById('btn-submit').disabled = true;
+
+            // Tính điểm
+            finalScore = 0;
+            const allItems = document.querySelectorAll('.trash-card');
+            let correctCount = 0;
+            const totalItems = allItems.length;
+
+            allItems.forEach(item => {
+                const correctType = item.dataset.type;
+                const userChoice = item.dataset.choice;
+
+                if (userChoice === correctType) {
+                    finalScore += 5; // 5 điểm/câu
+                    correctCount++;
+                    item.style.border = "4px solid #198754"; // Xanh
+                } else if (userChoice) {
+                    item.style.border = "4px solid #dc3545"; // Đỏ
+                }
+            });
+
+            // Hiện popup kết quả
+            setTimeout(() => {
+                document.getElementById('res-team').innerText = "Đơn vị: " + currentTeam;
+                document.getElementById('res-score').innerText = finalScore + " điểm";
+                
+                let msg = "";
+                if (finalScore == totalItems * 5) msg = "Xuất sắc! Tuyệt đối!";
+                else if (finalScore >= (totalItems * 5) * 0.8) msg = "Rất tốt! Bạn rất am hiểu!";
+                else msg = "Cần cố gắng phân loại kỹ hơn nhé!";
+                
+                document.getElementById('res-msg').innerText = `${msg} (Đúng ${correctCount}/${totalItems} câu)`;
+                document.getElementById('screen-result').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function saveAndExit() {
+            // Lưu vào localStorage
+            const data = JSON.parse(localStorage.getItem('greenSchoolData'));
+            const newRecord = {
+                team: currentTeam,
+                score: finalScore,
+                timeLeft: timeLeft, // Lưu thời gian còn lại (để so sánh phụ)
+                timestamp: new Date().getTime()
+            };
+            data.push(newRecord);
+            localStorage.setItem('greenSchoolData', JSON.stringify(data));
+
+            // Reset và về màn hình chính
+            location.reload();
+        }
+
+        // --- 5. BẢNG XẾP HẠNG ---
+        function showLeaderboard() {
+            document.getElementById('screen-register').classList.add('hidden');
+            document.getElementById('screen-leaderboard').classList.remove('hidden');
+            
+            const tbody = document.querySelector('#tbl-leaderboard tbody');
+            tbody.innerHTML = "";
+            
+            const data = JSON.parse(localStorage.getItem('greenSchoolData'));
+            
+            // Sắp xếp: Điểm cao xếp trên, nếu điểm bằng thì thời gian còn lại nhiều hơn (nhanh hơn) xếp trên
+            data.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return b.timeLeft - a.timeLeft;
+            });
+
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                // Format thời gian
+                const m = Math.floor(row.timeLeft / 60);
+                const s = row.timeLeft % 60;
+                const timeStr = `${m}:${s < 10 ? '0'+s : s}`;
+                
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td style="text-align:left; padding-left:20px;">${row.team}</td>
+                    <td style="font-weight:bold;">${row.score}</td>
+                    <td>${timeStr}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4'>Chưa có dữ liệu thi đấu</td></tr>";
+            }
+        }
+
+        function backToRegister() {
+            document.getElementById('screen-leaderboard').classList.add('hidden');
+            document.getElementById('screen-register').classList.remove('hidden');
+        }
+
+        function clearData() {
+            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử thi đấu không? Hành động này không thể hoàn tác.")) {
+                localStorage.removeItem('greenSchoolData');
+                alert("Đã xóa dữ liệu!");
+                showLeaderboard(); // Refresh lại bảng
+            }
+        }
+
+    </script>
+</body>
+</html>

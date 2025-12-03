@@ -17,13 +17,12 @@
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* --- THAY ĐỔI: Sử dụng tên file ảnh mới --- */
-            /* Đảm bảo bạn đã lưu ảnh với tên background_hoithi.jpg cùng thư mục */
+            /* Đảm bảo bạn vẫn để file ảnh background_hoithi.jpg ở cùng thư mục */
             background-image: url('background_hoithi.jpg'); 
-            background-size: cover;       /* Hình ảnh phủ kín màn hình */
-            background-position: center bottom;  /* Căn giữa và ưu tiên phần dưới của ảnh (nơi có hoạt động) */
-            background-repeat: no-repeat; /* Không lặp lại hình */
-            background-attachment: fixed; /* Cố định hình khi cuộn */
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             
             margin: 0;
             height: 100vh;
@@ -33,11 +32,10 @@
             user-select: none;
         }
 
-        /* --- MÀN HÌNH CHỜ & ĐĂNG KÝ --- */
+        /* --- UI CHUNG --- */
         .full-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Nền trắng mờ mạnh hơn để làm nổi bật chữ trên nền sặc sỡ */
             background: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(8px); 
             display: flex;
@@ -58,7 +56,7 @@
             padding: 15px;
             font-size: 1.5rem;
             border-radius: 10px;
-            border: 2px solid var(--primary); /* Viền màu xanh chủ đạo */
+            border: 2px solid var(--primary);
             width: 300px;
             text-align: center;
             margin-bottom: 20px;
@@ -74,12 +72,18 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
-            background: linear-gradient(45deg, var(--warning), #ffdb58); /* Gradient vàng sáng */
+            background: linear-gradient(45deg, var(--warning), #ffdb58);
             color: var(--dark);
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
         .btn-large:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 193, 7, 0.6); }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #28a745);
+            color: white;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
 
         /* --- BẢNG XẾP HẠNG --- */
         .leaderboard-box {
@@ -89,17 +93,17 @@
             border-radius: 15px;
             width: 80%;
             max-width: 800px;
-            max-height: 70vh;
+            max-height: 60vh;
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             border: 2px solid var(--primary);
         }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; font-size: 1.2rem; }
-        th { background: var(--primary); color: white; }
+        th { background: var(--primary); color: white; position: sticky; top: 0; }
         tr:nth-child(1) td { font-weight: bold; color: #d63384; font-size: 1.3rem; background-color: #fff0f5;} 
         
-        /* --- GAME UI --- */
+        /* --- GAME HEADER --- */
         header {
             background: rgba(255, 255, 255, 0.95);
             padding: 10px 20px;
@@ -114,163 +118,102 @@
 
         .team-name { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
         
-        .hud {
-            display: flex;
-            gap: 20px;
-            font-size: 1.4rem;
-            font-weight: bold;
-        }
-        
+        .hud { display: flex; gap: 20px; font-size: 1.4rem; font-weight: bold; }
         .timer-box { color: var(--danger); background: #fff5f5; padding: 5px 15px; border-radius: 8px; border: 2px solid var(--danger); }
-        .score-box { color: var(--success); background: #f0fff4; padding: 5px 15px; border-radius: 8px; border: 2px solid var(--success); }
 
         #btn-submit {
             background: linear-gradient(45deg, var(--danger), #ff6b6b);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            font-size: 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
-            transition: all 0.2s;
+            color: white; border: none; padding: 10px 25px; font-size: 1.2rem;
+            border-radius: 30px; cursor: pointer; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4); transition: all 0.2s;
         }
         #btn-submit:hover { transform: scale(1.05); }
         #btn-submit:disabled { background: #ccc; cursor: default; box-shadow: none; transform: none;}
 
         /* --- GAME AREA --- */
-        #game-container {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            position: relative;
-        }
-
+        #game-container { display: flex; flex: 1; flex-direction: column; position: relative; }
         #play-area {
-            flex: 1;
-            position: relative;
-            /* Nền trong suốt nhẹ để thấy hình nền vui nhộn phía sau */
+            flex: 1; position: relative;
             background-color: rgba(255, 255, 255, 0.7); 
             border-bottom: 3px solid #ccc;
         }
 
-        /* --- TRASH ITEMS --- */
         .trash-card {
-            width: 110px;
-            height: 110px;
-            position: absolute;
-            background: white;
-            border-radius: 12px;
+            width: 110px; height: 110px; position: absolute;
+            background: white; border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            transition: transform 0.2s;
-            z-index: 50;
-            border: 3px solid white; /* Viền dày hơn */
-            padding: 5px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: grab; transition: transform 0.2s; z-index: 50;
+            border: 3px solid white; padding: 5px;
         }
-
         .trash-card:active { cursor: grabbing; transform: scale(1.1); z-index: 100; border-color: var(--warning); }
-        
-        .trash-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1)); }
+        .trash-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; }
         .trash-label { font-size: 0.9rem; font-weight: bold; text-align: center; line-height: 1.1; color: #495057; }
 
         /* --- BINS --- */
         #bins-area {
-            height: 250px;
-            display: flex;
-            justify-content: space-evenly;
-            align-items: flex-end;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.85); /* Nền khu vực thùng rác sáng hơn */
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            height: 250px; display: flex; justify-content: space-evenly; align-items: flex-end;
+            padding: 10px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
         }
-
-        .bin-zone {
-            width: 30%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
+        .bin-zone { width: 30%; height: 100%; display: flex; flex-direction: column; position: relative; }
         .bin-storage {
-            flex: 1;
-            background: rgba(255,255,255,0.6);
-            border: 4px dashed #adb5bd; /* Viền nét đứt dày hơn */
-            border-radius: 15px 15px 0 0;
-            margin-bottom: 0;
-            padding: 5px;
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            justify-content: center;
-            overflow-y: auto;
-            transition: all 0.3s;
+            flex: 1; background: rgba(255,255,255,0.6);
+            border: 4px dashed #adb5bd; border-radius: 15px 15px 0 0;
+            margin-bottom: 0; padding: 5px; display: flex; flex-wrap: wrap;
+            align-content: flex-start; justify-content: center; overflow-y: auto; transition: all 0.3s;
         }
-
         .bin-storage.drag-over { background: rgba(255, 235, 59, 0.5); border-color: var(--warning); transform: scale(1.02); }
-
         .bin-header {
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.3rem; /* Chữ to hơn */
-            text-transform: uppercase;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            height: 50px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 1.3rem; text-transform: uppercase;
+            border-radius: 0 0 15px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-
         .trash-card.in-bin {
-            position: static !important;
-            width: 60px !important;
-            height: 60px !important;
-            margin: 3px;
-            border: 2px solid #ddd;
-            box-shadow: none;
+            position: static !important; width: 60px !important; height: 60px !important;
+            margin: 3px; border: 2px solid #ddd; box-shadow: none;
         }
         .trash-card.in-bin .trash-img { width: 35px; height: 35px; margin-bottom: 0; }
-        .trash-card.in-bin .trash-label { font-size: 0.6rem; display: none; }
+        .trash-card.in-bin .trash-label { display: none; }
 
         .bg-organic { background: linear-gradient(to bottom, var(--success), #28a745); }
         .bg-recycle { background: linear-gradient(to bottom, var(--info), #0dcaf0); }
         .bg-other { background: linear-gradient(to bottom, var(--dark), #343a40); }
 
-        .hidden { display: none !important; }
-
-        .btn-link { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 1.1rem;}
+        /* --- RESULT SCREEN STYLES --- */
+        #review-box {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .mistake-item {
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+            font-size: 1rem;
+        }
+        .mistake-item:last-child { border-bottom: none; }
+        .ans-wrong { color: var(--danger); font-weight: bold; text-decoration: line-through; }
+        .ans-right { color: var(--success); font-weight: bold; }
         
-        /* Tiêu đề chính có viền chữ để nổi bật trên nền động */
+        .hidden { display: none !important; }
+        .btn-link { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 1.1rem;}
+
         h1.main-title {
-             color: var(--primary);
-             text-transform: uppercase;
-             font-size: 3.5rem;
-             text-align: center;
-             /* Tạo viền trắng xung quanh chữ */
-             text-shadow: 
-                2px 2px 0 #fff,
-                -2px 2px 0 #fff,
-                2px -2px 0 #fff,
-                -2px -2px 0 #fff,
-                0px 4px 10px rgba(0,0,0,0.3);
+             color: var(--primary); text-transform: uppercase; font-size: 3.5rem; text-align: center;
+             text-shadow: 2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff, 0px 4px 10px rgba(0,0,0,0.3);
              margin-bottom: 10px;
         }
         h2.sub-title {
-            color: var(--dark);
-            font-weight: bold;
-            background: rgba(255,255,255,0.8);
-            padding: 5px 15px;
-            border-radius: 20px;
+            color: var(--dark); font-weight: bold; background: rgba(255,255,255,0.8);
+            padding: 5px 15px; border-radius: 20px;
         }
-
     </style>
 </head>
 <body>
@@ -305,9 +248,10 @@
                 </tbody>
             </table>
         </div>
-        <div style="margin-top: 20px; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 15px;">
-            <button class="btn-large" style="font-size: 1.2rem; padding: 10px 30px;" onclick="backToRegister()">Quay lại</button>
-            <button class="btn-link" style="color: var(--danger); margin-left: 20px;" onclick="clearData()">Xóa dữ liệu</button>
+        <div style="margin-top: 20px; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 15px; display: flex; gap: 10px; justify-content: center; align-items: center;">
+            <button class="btn-large" style="font-size: 1rem; padding: 10px 20px;" onclick="backToRegister()">Quay lại</button>
+            <button class="btn-large btn-success" style="font-size: 1rem; padding: 10px 20px;" onclick="exportExcel()">⬇ Xuất File Excel</button>
+            <button class="btn-link" style="color: var(--danger); margin-left: 10px; margin-top:0;" onclick="clearData()">Xóa dữ liệu</button>
         </div>
     </div>
 
@@ -317,12 +261,11 @@
             <button id="btn-submit" onclick="submitGame()">NỘP BÀI (KẾT THÚC)</button>
             <div class="hud">
                 <div class="timer-box">⏳ <span id="timer">04:00</span></div>
-                <div class="score-box" style="display:none">Điểm: <span id="score">0</span></div> </div>
+            </div>
         </header>
 
         <div id="game-container">
             <div id="play-area"></div>
-
             <div id="bins-area">
                 <div class="bin-zone">
                     <div class="bin-storage" id="bin-organic" data-type="organic"></div>
@@ -342,27 +285,31 @@
 
     <div id="screen-result" class="full-screen hidden" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);">
         <h1 style="color: white; text-shadow: 0 0 10px var(--warning);">🎉 KẾT QUẢ 🎉</h1>
-        <div style="background: white; padding: 40px; border-radius: 30px; text-align: center; color: black; box-shadow: 0 0 50px rgba(255,255,255,0.5); border: 5px solid var(--warning);">
-            <h2 id="res-team" style="color: var(--primary); font-size: 2rem;">Đội: ABC</h2>
-            <h1 id="res-score" style="font-size: 6rem; margin: 20px 0; color: var(--danger); font-weight: 900;">45/50</h1>
-            <p id="res-msg" style="font-size: 1.5rem; font-weight: bold; color: var(--success);">Cố gắng lên nhé!</p>
-            <button class="btn-large" style="margin-top: 20px;" onclick="saveAndExit()">LƯU KẾT QUẢ & RA NGOÀI</button>
+        <div style="background: white; padding: 30px; border-radius: 30px; text-align: center; color: black; box-shadow: 0 0 50px rgba(255,255,255,0.5); border: 5px solid var(--warning); width: 500px; max-width: 90%;">
+            <h2 id="res-team" style="color: var(--primary); font-size: 1.5rem;">Đội: ABC</h2>
+            <h1 id="res-score" style="font-size: 5rem; margin: 10px 0; color: var(--danger); font-weight: 900;">45/50</h1>
+            <p id="res-msg" style="font-size: 1.2rem; font-weight: bold; color: var(--success); margin-bottom: 5px;">Cố gắng lên nhé!</p>
+            
+            <div id="review-box">
+                </div>
+
+            <button class="btn-large" style="margin-top: 20px;" onclick="saveAndExit()">LƯU KẾT QUẢ</button>
         </div>
     </div>
 
     <script>
-        // --- 1. CÔNG NGHỆ TẠO HÌNH ẢNH TỰ ĐỘNG (SVG) ---
+        // --- 1. SVG GENERATOR ---
         function createSVGIcon(emoji, bgColor) {
             const svg = `
             <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="${bgColor}" stroke="#333" stroke-width="3"/> <text x="50" y="62" font-size="55" text-anchor="middle" font-family="Segoe UI Emoji, Arial">${emoji}</text>
+                <circle cx="50" cy="50" r="45" fill="${bgColor}" stroke="#333" stroke-width="3"/>
+                <text x="50" y="62" font-size="55" text-anchor="middle" font-family="Segoe UI Emoji, Arial">${emoji}</text>
             </svg>`;
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
         }
 
-        // --- 2. NGÂN HÀNG ĐỀ THI ---
+        // --- 2. DỮ LIỆU ---
         const trashDatabase = [
-            // --- NHÓM THỰC PHẨM ---
             { name: "Vỏ chuối", type: "organic", icon: "🍌", color: "#d4edda" },
             { name: "Xương cá", type: "organic", icon: "🐟", color: "#d4edda" },
             { name: "Rau héo", type: "organic", icon: "🥬", color: "#d4edda" },
@@ -373,7 +320,6 @@
             { name: "Bánh mì cũ", type: "organic", icon: "🥖", color: "#d4edda" },
             { name: "Hạt xoài", type: "organic", icon: "🥭", color: "#d4edda" },
             { name: "Hoa tàn", type: "organic", icon: "🥀", color: "#d4edda" },
-            // --- NHÓM TÁI CHẾ ---
             { name: "Chai nhựa", type: "recycle", icon: "🍾", color: "#cff4fc" },
             { name: "Lon nước", type: "recycle", icon: "🥤", color: "#cff4fc" },
             { name: "Giấy báo", type: "recycle", icon: "📰", color: "#cff4fc" },
@@ -384,7 +330,6 @@
             { name: "Thìa inox", type: "recycle", icon: "🥄", color: "#cff4fc" },
             { name: "Vở học sinh", type: "recycle", icon: "📒", color: "#cff4fc" },
             { name: "Ghế nhựa hỏng", type: "recycle", icon: "🪑", color: "#cff4fc" },
-            // --- NHÓM CÒN LẠI ---
             { name: "Túi nilon", type: "other", icon: "🛍️", color: "#e2e3e5" },
             { name: "Khẩu trang", type: "other", icon: "😷", color: "#e2e3e5" },
             { name: "Ly sành vỡ", type: "other", icon: "🍵", color: "#e2e3e5" },
@@ -395,14 +340,21 @@
             { name: "Bút bi hết mực", type: "other", icon: "🖊️", color: "#e2e3e5" },
             { name: "Gương vỡ", type: "other", icon: "🪞", color: "#e2e3e5" },
             { name: "Bật lửa", type: "other", icon: "🔥", color: "#e2e3e5" },
-            // --- CÁC CÂU HỎI BẪY ---
             { name: "Ly giấy cafe", type: "other", icon: "☕", color: "#fff3cd" }, 
             { name: "Hộp xốp bẩn", type: "other", icon: "🥡", color: "#fff3cd" }, 
             { name: "Pin cũ", type: "other", icon: "🔋", color: "#fff3cd" },
             { name: "Ống hút", type: "other", icon: "🧃", color: "#fff3cd" },
         ];
 
-        // --- 3. QUẢN LÝ GAME ---
+        // --- 3. HELPER FUNCTIONS ---
+        function getTypeName(type) {
+            if (type === 'organic') return 'Rác thực phẩm';
+            if (type === 'recycle') return 'Rác tái chế';
+            if (type === 'other') return 'Rác còn lại';
+            return 'Chưa phân loại';
+        }
+
+        // --- 4. GAME LOGIC ---
         let currentTeam = "";
         let gameTimer;
         let timeLeft = 240; 
@@ -427,7 +379,6 @@
             
             document.getElementById('screen-register').classList.add('hidden');
             document.getElementById('screen-game').classList.remove('hidden');
-            
             startGame();
         }
 
@@ -463,6 +414,7 @@
                 el.classList.add('trash-card');
                 el.id = 'trash-' + i;
                 el.dataset.type = item.type;
+                el.dataset.name = item.name; // Lưu tên để hiển thị lỗi
 
                 const img = document.createElement('img');
                 img.src = createSVGIcon(item.icon, item.color);
@@ -485,7 +437,7 @@
             });
         }
 
-        // --- XỬ LÝ KÉO THẢ ---
+        // --- XỬ LÝ KÉO THẢ (DRAG) ---
         let activeItem = null;
         let startX, startY, startLeft, startTop;
 
@@ -497,71 +449,44 @@
         function dragStart(e) {
             if (!isPlaying) return;
             if (e.type === 'touchstart') e.preventDefault();
-            
             activeItem = this;
-            
             if (activeItem.classList.contains('in-bin')) {
                 activeItem.classList.remove('in-bin');
                 activeItem.style.position = 'absolute';
                 document.getElementById('play-area').appendChild(activeItem);
             }
-
             const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            
-            startX = clientX;
-            startY = clientY;
-            
+            startX = clientX; startY = clientY;
             const rect = activeItem.getBoundingClientRect();
             const areaRect = document.getElementById('play-area').getBoundingClientRect();
-            
-            startLeft = rect.left - areaRect.left;
-            startTop = rect.top - areaRect.top;
-
-            activeItem.style.left = startLeft + 'px';
-            activeItem.style.top = startTop + 'px';
-
-            document.addEventListener('mousemove', dragMove);
-            document.addEventListener('mouseup', dragEnd);
-            document.addEventListener('touchmove', dragMove, {passive: false});
-            document.addEventListener('touchend', dragEnd);
+            startLeft = rect.left - areaRect.left; startTop = rect.top - areaRect.top;
+            activeItem.style.left = startLeft + 'px'; activeItem.style.top = startTop + 'px';
+            document.addEventListener('mousemove', dragMove); document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchmove', dragMove, {passive: false}); document.addEventListener('touchend', dragEnd);
         }
 
         function dragMove(e) {
             if (!activeItem) return;
             if (e.type === 'touchmove') e.preventDefault();
-
             const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-
-            const dx = clientX - startX;
-            const dy = clientY - startY;
-
-            activeItem.style.left = (startLeft + dx) + 'px';
-            activeItem.style.top = (startTop + dy) + 'px';
-
+            const dx = clientX - startX; const dy = clientY - startY;
+            activeItem.style.left = (startLeft + dx) + 'px'; activeItem.style.top = (startTop + dy) + 'px';
             document.querySelectorAll('.bin-storage').forEach(bin => {
                 const rect = bin.getBoundingClientRect();
                 if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
                     bin.classList.add('drag-over');
-                } else {
-                    bin.classList.remove('drag-over');
-                }
+                } else { bin.classList.remove('drag-over'); }
             });
         }
 
         function dragEnd(e) {
             if (!activeItem) return;
-            
-            document.removeEventListener('mousemove', dragMove);
-            document.removeEventListener('mouseup', dragEnd);
-            document.removeEventListener('touchmove', dragMove);
-            document.removeEventListener('touchend', dragEnd);
-
+            document.removeEventListener('mousemove', dragMove); document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchmove', dragMove); document.removeEventListener('touchend', dragEnd);
             const rect = activeItem.getBoundingClientRect();
-            const center_x = rect.left + rect.width/2;
-            const center_y = rect.top + rect.height/2;
-
+            const center_x = rect.left + rect.width/2; const center_y = rect.top + rect.height/2;
             let droppedBin = null;
             document.querySelectorAll('.bin-storage').forEach(bin => {
                 bin.classList.remove('drag-over');
@@ -570,37 +495,29 @@
                     droppedBin = bin;
                 }
             });
-
             if (droppedBin) {
                 droppedBin.appendChild(activeItem);
                 activeItem.classList.add('in-bin');
-                activeItem.style.left = 'auto';
-                activeItem.style.top = 'auto';
+                activeItem.style.left = 'auto'; activeItem.style.top = 'auto';
                 activeItem.dataset.choice = droppedBin.dataset.type;
             } else {
                 const area = document.getElementById('play-area');
-                let finalL = parseInt(activeItem.style.left);
-                let finalT = parseInt(activeItem.style.top);
-                
-                if(finalL < 0) finalL = 0;
-                if(finalT < 0) finalT = 0;
+                let finalL = parseInt(activeItem.style.left); let finalT = parseInt(activeItem.style.top);
+                if(finalL < 0) finalL = 0; if(finalT < 0) finalT = 0;
                 if(finalL > area.clientWidth - 100) finalL = area.clientWidth - 100;
                 if(finalT > area.clientHeight - 100) finalT = area.clientHeight - 100;
-
-                activeItem.style.left = finalL + 'px';
-                activeItem.style.top = finalT + 'px';
+                activeItem.style.left = finalL + 'px'; activeItem.style.top = finalT + 'px';
                 activeItem.dataset.choice = "";
             }
-
             activeItem = null;
         }
 
         function updateTimerDisplay() {
-            const m = Math.floor(timeLeft / 60);
-            const s = timeLeft % 60;
+            const m = Math.floor(timeLeft / 60); const s = timeLeft % 60;
             document.getElementById('timer').innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
         }
 
+        // --- 5. TÍNH ĐIỂM VÀ XEM KẾT QUẢ CHI TIẾT ---
         function submitGame() {
             if (!isPlaying) return;
             isPlaying = false;
@@ -611,32 +528,59 @@
             const allItems = document.querySelectorAll('.trash-card');
             let correctCount = 0;
             const totalItems = allItems.length;
+            
+            // Chuẩn bị nội dung hiển thị lỗi sai
+            let reviewHTML = "";
+            let mistakeCount = 0;
 
             allItems.forEach(item => {
                 const correctType = item.dataset.type;
-                const userChoice = item.dataset.choice;
+                const userChoice = item.dataset.choice || ""; // Nếu chưa chọn thì là rỗng
+                const itemName = item.dataset.name;
 
                 if (userChoice === correctType) {
                     finalScore += 5; 
                     correctCount++;
                     item.style.border = "4px solid #198754";
-                } else if (userChoice) {
+                } else {
                     item.style.border = "4px solid #dc3545";
+                    // Ghi nhận lỗi sai
+                    mistakeCount++;
+                    const userChoiceText = userChoice ? getTypeName(userChoice) : "Chưa bỏ thùng";
+                    const correctText = getTypeName(correctType);
+                    
+                    reviewHTML += `
+                    <div class="mistake-item">
+                        <div>❌ <b>${itemName}</b></div>
+                        <div style="font-size: 0.9rem;">
+                            Bạn chọn: <span class="ans-wrong">${userChoiceText}</span> <br>
+                            Đúng là: <span class="ans-right">${correctText}</span>
+                        </div>
+                    </div>`;
                 }
             });
+
+            // Nếu làm đúng hết
+            if (mistakeCount === 0) {
+                reviewHTML = "<p style='color:green; font-weight:bold;'>Xuất sắc! Bạn không sai câu nào.</p>";
+            }
 
             setTimeout(() => {
                 document.getElementById('res-team').innerText = "Đơn vị: " + currentTeam;
                 document.getElementById('res-score').innerText = finalScore + " điểm";
                 
                 let msg = "";
-                if (finalScore == totalItems * 5) msg = "Xuất sắc! Tuyệt đối!";
-                else if (finalScore >= (totalItems * 5) * 0.8) msg = "Rất tốt! Bạn rất am hiểu!";
-                else msg = "Cần cố gắng phân loại kỹ hơn nhé!";
+                if (finalScore == totalItems * 5) msg = "Tuyệt đối! Xuất sắc!";
+                else if (finalScore >= (totalItems * 5) * 0.8) msg = "Rất tốt! Kiến thức vững vàng!";
+                else msg = "Hãy xem lại các câu sai bên dưới nhé!";
                 
                 document.getElementById('res-msg').innerText = `${msg} (Đúng ${correctCount}/${totalItems} câu)`;
+                
+                // Hiển thị chi tiết lỗi
+                document.getElementById('review-box').innerHTML = reviewHTML;
+
                 document.getElementById('screen-result').classList.remove('hidden');
-            }, 1000);
+            }, 500);
         }
 
         function saveAndExit() {
@@ -652,13 +596,13 @@
             location.reload();
         }
 
+        // --- 6. BẢNG XẾP HẠNG & XUẤT FILE ---
         function showLeaderboard() {
             document.getElementById('screen-register').classList.add('hidden');
             document.getElementById('screen-leaderboard').classList.remove('hidden');
             
             const tbody = document.querySelector('#tbl-leaderboard tbody');
             tbody.innerHTML = "";
-            
             const data = JSON.parse(localStorage.getItem('greenSchoolData'));
             
             data.sort((a, b) => {
@@ -686,20 +630,53 @@
             }
         }
 
+        // --- TÍNH NĂNG XUẤT EXCEL (CSV) ---
+        function exportExcel() {
+            const data = JSON.parse(localStorage.getItem('greenSchoolData'));
+            if (!data || data.length === 0) {
+                alert("Chưa có dữ liệu để xuất!");
+                return;
+            }
+
+            // Sắp xếp lại trước khi xuất
+            data.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return b.timeLeft - a.timeLeft;
+            });
+
+            // Tạo nội dung CSV (Có BOM \uFEFF để Excel đọc đúng tiếng Việt)
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Hạng,Tên Đơn Vị,Điểm Số,Thời Gian Còn Lại (Giây),Ngày Thi\n";
+
+            data.forEach((row, index) => {
+                const date = new Date(row.timestamp).toLocaleString('vi-VN');
+                // Escape dấu phẩy nếu tên trường có dấu phẩy
+                const safeName = `"${row.team.replace(/"/g, '""')}"`; 
+                csvContent += `${index + 1},${safeName},${row.score},${row.timeLeft},${date}\n`;
+            });
+
+            // Tạo link tải ảo và click vào nó
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Ket_Qua_Hoi_Thi_Phan_Loai_Rac.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function backToRegister() {
             document.getElementById('screen-leaderboard').classList.add('hidden');
             document.getElementById('screen-register').classList.remove('hidden');
         }
 
         function clearData() {
-            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử thi đấu không? Hành động này không thể hoàn tác.")) {
+            if(confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa toàn bộ dữ liệu không?\nHãy chắc chắn bạn ĐÃ XUẤT FILE EXCEL trước khi xóa!")) {
                 localStorage.removeItem('greenSchoolData');
                 alert("Đã xóa dữ liệu!");
                 showLeaderboard();
             }
         }
-
     </script>
 </body>
 </html>
-```

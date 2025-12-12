@@ -17,7 +17,7 @@
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Đảm bảo bạn vẫn để file ảnh background_hoithi.jpg ở cùng thư mục */
+            /* Đảm bảo file ảnh background_hoithi.jpg nằm cùng thư mục */
             background-image: url('background_hoithi.jpg'); 
             background-size: cover;
             background-position: center bottom;
@@ -139,16 +139,17 @@
         }
 
         .trash-card {
-            width: 110px; height: 110px; position: absolute;
+            width: 100px; height: 100px; /* Thu nhỏ xíu để chứa đủ 20 món */
+            position: absolute;
             background: white; border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: grab; transition: transform 0.2s; z-index: 50;
-            border: 3px solid white; padding: 5px;
+            border: 3px solid white; padding: 2px;
         }
         .trash-card:active { cursor: grabbing; transform: scale(1.1); z-index: 100; border-color: var(--warning); }
-        .trash-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; }
-        .trash-label { font-size: 0.9rem; font-weight: bold; text-align: center; line-height: 1.1; color: #495057; }
+        .trash-img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 2px; }
+        .trash-label { font-size: 0.8rem; font-weight: bold; text-align: center; line-height: 1.1; color: #495057; }
 
         /* --- BINS --- */
         #bins-area {
@@ -170,10 +171,10 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         .trash-card.in-bin {
-            position: static !important; width: 60px !important; height: 60px !important;
-            margin: 3px; border: 2px solid #ddd; box-shadow: none;
+            position: static !important; width: 50px !important; height: 50px !important;
+            margin: 2px; border: 2px solid #ddd; box-shadow: none;
         }
-        .trash-card.in-bin .trash-img { width: 35px; height: 35px; margin-bottom: 0; }
+        .trash-card.in-bin .trash-img { width: 30px; height: 30px; margin-bottom: 0; }
         .trash-card.in-bin .trash-label { display: none; }
 
         .bg-organic { background: linear-gradient(to bottom, var(--success), #28a745); }
@@ -287,11 +288,10 @@
         <h1 style="color: white; text-shadow: 0 0 10px var(--warning);">🎉 KẾT QUẢ 🎉</h1>
         <div style="background: white; padding: 30px; border-radius: 30px; text-align: center; color: black; box-shadow: 0 0 50px rgba(255,255,255,0.5); border: 5px solid var(--warning); width: 500px; max-width: 90%;">
             <h2 id="res-team" style="color: var(--primary); font-size: 1.5rem;">Đội: ABC</h2>
-            <h1 id="res-score" style="font-size: 5rem; margin: 10px 0; color: var(--danger); font-weight: 900;">45/50</h1>
+            <h1 id="res-score" style="font-size: 5rem; margin: 10px 0; color: var(--danger); font-weight: 900;">45/100</h1>
             <p id="res-msg" style="font-size: 1.2rem; font-weight: bold; color: var(--success); margin-bottom: 5px;">Cố gắng lên nhé!</p>
             
-            <div id="review-box">
-                </div>
+            <div id="review-box"></div>
 
             <button class="btn-large" style="margin-top: 20px;" onclick="saveAndExit()">LƯU KẾT QUẢ</button>
         </div>
@@ -308,18 +308,19 @@
             return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
         }
 
-        // --- 2. DỮ LIỆU ---
+        // --- 2. CẬP NHẬT DỮ LIỆU RÁC (ĐÃ CHỈNH SỬA & THÊM MỚI) ---
         const trashDatabase = [
+            // --- NHÓM THỰC PHẨM (Xanh lá) ---
             { name: "Vỏ chuối", type: "organic", icon: "🍌", color: "#d4edda" },
             { name: "Xương cá", type: "organic", icon: "🐟", color: "#d4edda" },
             { name: "Rau héo", type: "organic", icon: "🥬", color: "#d4edda" },
-            { name: "Vỏ trứng", type: "organic", icon: "🥚", color: "#d4edda" },
-            { name: "Bã trà", type: "organic", icon: "🫖", color: "#d4edda" },
             { name: "Cơm thừa", type: "organic", icon: "🍚", color: "#d4edda" },
             { name: "Vỏ cam", type: "organic", icon: "🍊", color: "#d4edda" },
             { name: "Bánh mì cũ", type: "organic", icon: "🥖", color: "#d4edda" },
-            { name: "Hạt xoài", type: "organic", icon: "🥭", color: "#d4edda" },
-            { name: "Hoa tàn", type: "organic", icon: "🥀", color: "#d4edda" },
+            { name: "Xương gà", type: "organic", icon: "🍗", color: "#d4edda" }, // Mới
+            { name: "Đầu tôm", type: "organic", icon: "🦐", color: "#d4edda" }, // Mới
+
+            // --- NHÓM TÁI CHẾ (Xanh dương) ---
             { name: "Chai nhựa", type: "recycle", icon: "🍾", color: "#cff4fc" },
             { name: "Lon nước", type: "recycle", icon: "🥤", color: "#cff4fc" },
             { name: "Giấy báo", type: "recycle", icon: "📰", color: "#cff4fc" },
@@ -330,7 +331,13 @@
             { name: "Thìa inox", type: "recycle", icon: "🥄", color: "#cff4fc" },
             { name: "Vở học sinh", type: "recycle", icon: "📒", color: "#cff4fc" },
             { name: "Ghế nhựa hỏng", type: "recycle", icon: "🪑", color: "#cff4fc" },
-            { name: "Túi nilon", type: "other", icon: "🛍️", color: "#e2e3e5" },
+            { name: "Hộp sữa giấy", type: "recycle", icon: "🧃", color: "#cff4fc" }, // Mới (Vỏ hộp sữa sau khi làm sạch)
+            { name: "Giấy vụn", type: "recycle", icon: "📃", color: "#cff4fc" }, // Mới
+
+            // --- NHÓM CÒN LẠI (Xám/Other) ---
+            // Đã chuyển Vỏ trứng và Bã trà xuống đây theo yêu cầu
+            { name: "Vỏ trứng", type: "other", icon: "🥚", color: "#e2e3e5" }, 
+            { name: "Bã trà", type: "other", icon: "🫖", color: "#e2e3e5" },
             { name: "Khẩu trang", type: "other", icon: "😷", color: "#e2e3e5" },
             { name: "Ly sành vỡ", type: "other", icon: "🍵", color: "#e2e3e5" },
             { name: "Tã giấy", type: "other", icon: "🧷", color: "#e2e3e5" },
@@ -338,12 +345,16 @@
             { name: "Gói kẹo", type: "other", icon: "🍬", color: "#e2e3e5" },
             { name: "Gói snack", type: "other", icon: "🍟", color: "#e2e3e5" },
             { name: "Bút bi hết mực", type: "other", icon: "🖊️", color: "#e2e3e5" },
-            { name: "Gương vỡ", type: "other", icon: "🪞", color: "#e2e3e5" },
             { name: "Bật lửa", type: "other", icon: "🔥", color: "#e2e3e5" },
-            { name: "Ly giấy cafe", type: "other", icon: "☕", color: "#fff3cd" }, 
-            { name: "Hộp xốp bẩn", type: "other", icon: "🥡", color: "#fff3cd" }, 
-            { name: "Pin cũ", type: "other", icon: "🔋", color: "#fff3cd" },
-            { name: "Ống hút", type: "other", icon: "🧃", color: "#fff3cd" },
+            { name: "Ly giấy cafe", type: "other", icon: "🥤", color: "#e2e3e5" }, 
+            { name: "Hộp xốp bẩn", type: "other", icon: "🥡", color: "#e2e3e5" }, 
+            { name: "Ống hút", type: "other", icon: "🧃", color: "#e2e3e5" },
+            { name: "Hoa tàn", type: "other", icon: "🥀", color: "#d4edda" },
+            { name: "Kẹo cao su", type: "other", icon: "🫧", color: "#e2e3e5" }, // Mới
+            { name: "Tăm tre", type: "other", icon: "🥢", color: "#e2e3e5" }, // Mới
+            { name: "Bông tẩy trang", type: "other", icon: "☁️", color: "#e2e3e5" }, // Mới
+            { name: "Vỏ sầu riêng", type: "other", icon: "🍈", color: "#d4edda" }, // Mới
+            { name: "Bã cà phê", type: "other", icon: "☕", color: "#d4edda" }, // Mới
         ];
 
         // --- 3. HELPER FUNCTIONS ---
@@ -392,7 +403,8 @@
             document.getElementById('play-area').innerHTML = '';
             document.querySelectorAll('.bin-storage').forEach(b => b.innerHTML = '');
 
-            spawnTrash(15);
+            // --- THAY ĐỔI: Tăng số lượng rác lên 20 món để đạt 100 điểm (20 * 5) ---
+            spawnTrash(20);
 
             clearInterval(gameTimer);
             gameTimer = setInterval(() => {
@@ -414,7 +426,7 @@
                 el.classList.add('trash-card');
                 el.id = 'trash-' + i;
                 el.dataset.type = item.type;
-                el.dataset.name = item.name; // Lưu tên để hiển thị lỗi
+                el.dataset.name = item.name;
 
                 const img = document.createElement('img');
                 img.src = createSVGIcon(item.icon, item.color);
@@ -427,8 +439,8 @@
                 el.appendChild(img);
                 el.appendChild(lbl);
 
-                const maxX = area.clientWidth - 120;
-                const maxY = area.clientHeight - 120;
+                const maxX = area.clientWidth - 110;
+                const maxY = area.clientHeight - 110;
                 el.style.left = Math.random() * maxX + 'px';
                 el.style.top = Math.random() * maxY + 'px';
 
@@ -529,22 +541,20 @@
             let correctCount = 0;
             const totalItems = allItems.length;
             
-            // Chuẩn bị nội dung hiển thị lỗi sai
             let reviewHTML = "";
             let mistakeCount = 0;
 
             allItems.forEach(item => {
                 const correctType = item.dataset.type;
-                const userChoice = item.dataset.choice || ""; // Nếu chưa chọn thì là rỗng
+                const userChoice = item.dataset.choice || ""; 
                 const itemName = item.dataset.name;
 
                 if (userChoice === correctType) {
-                    finalScore += 5; 
+                    finalScore += 5; // 5 điểm/câu
                     correctCount++;
                     item.style.border = "4px solid #198754";
                 } else {
                     item.style.border = "4px solid #dc3545";
-                    // Ghi nhận lỗi sai
                     mistakeCount++;
                     const userChoiceText = userChoice ? getTypeName(userChoice) : "Chưa bỏ thùng";
                     const correctText = getTypeName(correctType);
@@ -560,14 +570,13 @@
                 }
             });
 
-            // Nếu làm đúng hết
             if (mistakeCount === 0) {
                 reviewHTML = "<p style='color:green; font-weight:bold;'>Xuất sắc! Bạn không sai câu nào.</p>";
             }
 
             setTimeout(() => {
                 document.getElementById('res-team').innerText = "Đơn vị: " + currentTeam;
-                document.getElementById('res-score').innerText = finalScore + " điểm";
+                document.getElementById('res-score').innerText = finalScore + " điểm"; // Sẽ hiển thị tối đa 100
                 
                 let msg = "";
                 if (finalScore == totalItems * 5) msg = "Tuyệt đối! Xuất sắc!";
@@ -575,10 +584,7 @@
                 else msg = "Hãy xem lại các câu sai bên dưới nhé!";
                 
                 document.getElementById('res-msg').innerText = `${msg} (Đúng ${correctCount}/${totalItems} câu)`;
-                
-                // Hiển thị chi tiết lỗi
                 document.getElementById('review-box').innerHTML = reviewHTML;
-
                 document.getElementById('screen-result').classList.remove('hidden');
             }, 500);
         }
@@ -630,32 +636,23 @@
             }
         }
 
-        // --- TÍNH NĂNG XUẤT EXCEL (CSV) ---
         function exportExcel() {
             const data = JSON.parse(localStorage.getItem('greenSchoolData'));
             if (!data || data.length === 0) {
                 alert("Chưa có dữ liệu để xuất!");
                 return;
             }
-
-            // Sắp xếp lại trước khi xuất
             data.sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 return b.timeLeft - a.timeLeft;
             });
-
-            // Tạo nội dung CSV (Có BOM \uFEFF để Excel đọc đúng tiếng Việt)
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
             csvContent += "Hạng,Tên Đơn Vị,Điểm Số,Thời Gian Còn Lại (Giây),Ngày Thi\n";
-
             data.forEach((row, index) => {
                 const date = new Date(row.timestamp).toLocaleString('vi-VN');
-                // Escape dấu phẩy nếu tên trường có dấu phẩy
                 const safeName = `"${row.team.replace(/"/g, '""')}"`; 
                 csvContent += `${index + 1},${safeName},${row.score},${row.timeLeft},${date}\n`;
             });
-
-            // Tạo link tải ảo và click vào nó
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
